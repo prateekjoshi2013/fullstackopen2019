@@ -33,7 +33,6 @@ const Statistic =({clicksDetail})=>{
 
 const Button = ({clickDetails}) =>{
  const {text,click,clickHandler}=clickDetails
- console.log(clickHandler)
  return (<><button onClick={()=>{ clickHandler(click+1) }}>{text}</button></>)
 }
 

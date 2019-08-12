@@ -1,15 +1,20 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import Search from "./Search"
 import Numbers from "./Numbers"
+import service from "./DataService"
 
 const App = () => {
-  const [ persons, setPersons] = useState([
-    { name: 'Arto Hellas' , number: '1231231313'}
-  ]) 
+  const [ persons, setPersons] = useState([]) 
   const [newName,setNewName]= useState('')
   const [newNumber,setNewNumber]= useState('')
-  const [ newPerson, setNewPerson ] = useState({name:'',number:''})
+  const [ newPerson, setNewPerson ] = useState({name:'',number:'', id:''})
   const [newSearchString,setNewSearchString]=useState('')
+
+  useEffect(()=>{
+    service.getAll().then(data=>{
+      setPersons(data)
+    })
+  },[])
 
   const handleSearchString=(event)=>{
     setNewSearchString(event.target.value)
@@ -33,13 +38,28 @@ const App = () => {
     setNewPerson(person)
   }
 
+
+
   const handleClick=(event)=>{
     event.preventDefault()
-    if(persons.map(p=>p.name).indexOf(newName)>=0){
-      console.log(persons.indexOf(newName))
-      alert(`${newName} is already added to phonebook`)
+    let index=persons.map(p=>p.name).indexOf(newName)
+    if(index>=0){
+      let res=window.confirm(`${newName} is already added to phonebook, replace the old number with a new one ?`)
+      if(res){
+        service.update(persons[index].id,{...persons[index],number:newPerson.number}).then(r=>{
+          service.getAll().then(data=>{
+            setPersons(data)
+          })  
+        })
+      }
     }else{
-      setPersons([...persons].concat(newPerson))
+      service.create(newPerson).then(response=>{
+        service.getAll().then(data=>{
+          setPersons(data)
+        })
+      }).catch( response=>
+        console.log('fail')
+      )
     }
     setNewName('')
     setNewNumber('')
@@ -49,7 +69,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <div>search:<input value={newSearchString} onChange={handleSearchString} /></div>
-      <Search persons={persons} searchString={newSearchString} smode={'y'}/>
+      <Search persons={persons} searchString={newSearchString} smode={'y'} setP={setPersons} />
       <div>
       <h2>add a new</h2>  
       <form onSubmit={handleClick}>
@@ -58,8 +78,8 @@ const App = () => {
         <div><button type="submit">add</button></div>
       </form> 
       </div>
-      
-      <Numbers persons={persons} searchString={newSearchString} smode={'n'}/>
+    
+      <Numbers persons={persons} searchString={newSearchString} smode={'n'} setP={setPersons}/>
     </div>
   )
 }
