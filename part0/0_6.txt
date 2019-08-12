@@ -1,0 +1,2 @@
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa  REQUEST PAYLOAD [{content: "new notes",date:"201908-12T20:26:07.654Z"}]
+server-->browser: RESPONSE BODY  [{"message":"note created"}]
