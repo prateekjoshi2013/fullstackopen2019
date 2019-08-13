@@ -5,7 +5,7 @@ const Numbers=(props)=>{
     return (
       <>
       <h2>Numbers</h2>
-      <Number searchString={''} persons={props.persons} smode={'n'} setP={props.setP}></Number>
+      <Number searchString={''} persons={props.persons} smode={'n'} setP={props.setP} setMess={props.setM}></Number>
       </>
     )
   }

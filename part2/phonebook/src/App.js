@@ -3,12 +3,65 @@ import Search from "./Search"
 import Numbers from "./Numbers"
 import service from "./DataService"
 
+const Notification=(props)=>{
+
+  console.log(props)
+  const {text,type}=props.messageObj
+  const styleUpdated={ 
+    color: 'blue',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+    }
+  const styleCreated={ 
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+  const styleError={ 
+    color: 'red',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+  if(text===null){
+    return null
+  }
+
+let styleApplied=null
+  if(type==='c'){
+    styleApplied=styleCreated  
+  }else if(type==='u'){
+    styleApplied=styleUpdated  
+  }else if(type==='e'){
+    styleApplied=styleError   
+  }
+console.log(styleApplied)
+  return (
+    <div style={styleApplied} >
+      {text}
+    </div>
+  )
+}
+
+
 const App = () => {
   const [ persons, setPersons] = useState([]) 
   const [newName,setNewName]= useState('')
   const [newNumber,setNewNumber]= useState('')
   const [ newPerson, setNewPerson ] = useState({name:'',number:'', id:''})
   const [newSearchString,setNewSearchString]=useState('')
+  const [message,setMessage]=useState({text:null,type:null})
 
   useEffect(()=>{
     service.getAll().then(data=>{
@@ -47,6 +100,9 @@ const App = () => {
       let res=window.confirm(`${newName} is already added to phonebook, replace the old number with a new one ?`)
       if(res){
         service.update(persons[index].id,{...persons[index],number:newPerson.number}).then(r=>{
+      let res=window.confirm(`${newName} is already added to phonebook, replace the old number with a new one ?`)
+          setMessage({text:`updated ${newName}`,type:'u'})
+          setTimeout(()=>{setMessage({text:null,type:null})},5000)
           service.getAll().then(data=>{
             setPersons(data)
           })  
@@ -54,6 +110,8 @@ const App = () => {
       }
     }else{
       service.create(newPerson).then(response=>{
+        setMessage({text:`created  ${newPerson.name}`,type:'c'})
+        setTimeout(()=>{setMessage({text:null,type:null})},5000)
         service.getAll().then(data=>{
           setPersons(data)
         })
@@ -68,6 +126,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification messageObj={message} />
       <div>search:<input value={newSearchString} onChange={handleSearchString} /></div>
       <Search persons={persons} searchString={newSearchString} smode={'y'} setP={setPersons} />
       <div>
@@ -79,7 +138,7 @@ const App = () => {
       </form> 
       </div>
     
-      <Numbers persons={persons} searchString={newSearchString} smode={'n'} setP={setPersons}/>
+      <Numbers persons={persons} searchString={newSearchString} smode={'n'} setP={setPersons} setM={setMessage}/>
     </div>
   )
 }
