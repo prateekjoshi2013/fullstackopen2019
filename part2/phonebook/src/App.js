@@ -121,6 +121,7 @@ const App = () => {
     }
     setNewName('')
     setNewNumber('')
+    setNewPerson({name:'',number:'', id:''})
   }
 
   return (
